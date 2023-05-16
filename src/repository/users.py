@@ -9,6 +9,11 @@ async def get_users(db: Session):
     return users
 
 
+async def get_users_birthday(birthday: str, db: Session):
+    users = db.query(User).filter_by(birthday=birthday).all()
+    return users
+
+
 async def get_user_by_id(user_id: int, db: Session):
     user = db.query(User).filter_by(id=user_id).first()
     return user

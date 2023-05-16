@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Path, status
@@ -18,15 +19,41 @@ async def get_users(db: Session = Depends(get_db)):
 
 
 # ----------begin------------------------------------------------------------------------------------
-@router.get("/", response_model=List[UserResponse])
-async def get_users_by_first_name(first_name: str, db: Session = Depends(get_db)):
-    users = await repository_users.get_users_by_first_name(first_name, db)
-    if user is None:
+@router.get("/birthday", response_model=List[UserResponse])
+async def get_users_birthday(db: Session = Depends(get_db)):
+    #  async def get_users_birthday(difference_days: int = 7, db: Session = Depends(get_db)):
+    difference_days = 7 + 1
+    present_day = datetime.datetime.now().date()
+
+    users = []
+    all_users = await repository_users.get_users(db).all()
+
+    async for user in all_users:
+        if user['birthday'] is None:
+            continue
+        birthday_user = user['birthday'].strptime('%d-%m-%Y')                         #  ------------------------
+                                                                                   # что приходит - может быть ошибка
+        birthday_user_current_year = birthday_user.replace(year=present_day.year)
+        delta_birthday = (birthday_user_current_year - today).days
+
+        if 0 < delta_birthday < difference_days:
+            user = User(user)          #  --------------------   )))))))))))))))))))))))))))))))))))))))
+            users.append(user)         # = await repository_users.get_users_birthday(db)
+
+    if not bool(users):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found!")
     return users
 
 
-@router.get("/", response_model=List[UserResponse])
+@router.get("/first_name/{user_id}", response_model=List[UserResponse])
+async def get_users_by_first_name(first_name: str, db: Session = Depends(get_db)):
+    users = await repository_users.get_users_by_first_name(first_name, db)
+    if users is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found!")
+    return users
+
+
+@router.get("/last_name/{user_id}", response_model=List[UserResponse])
 async def get_users_by_last_name(last_name: str, db: Session = Depends(get_db)):
     users = await repository_users.get_users_by_last_name(last_name, db)
     if user is None:
@@ -34,7 +61,7 @@ async def get_users_by_last_name(last_name: str, db: Session = Depends(get_db)):
     return users
 
 
-@router.get("/", response_model=UserResponse)
+@router.get("/email/{user_id}", response_model=UserResponse)
 async def get_user_by_email(body: UserModel, db: Session = Depends(get_db)):
     user = await repository_users.get_user_by_email(body.email, db)
     if user is None:
