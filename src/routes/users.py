@@ -37,7 +37,7 @@ async def get_users_birthday(db: Session = Depends(get_db)):
         delta_birthday = (birthday_user_current_year - today).days
 
         if 0 < delta_birthday < difference_days:
-            user = User(user)          #  --------------------   )))))))))))))))))))))))))))))))))))))))
+            # user = User(user)          #  --------------------   )))))))))))))))))))))))))))))))))))))))
             users.append(user)         # = await repository_users.get_users_birthday(db)
 
     if not bool(users):
@@ -45,7 +45,7 @@ async def get_users_birthday(db: Session = Depends(get_db)):
     return users
 
 
-@router.get("/first_name/{user_id}", response_model=List[UserResponse])
+@router.get("/first_name/{first_name}", response_model=List[UserResponse])
 async def get_users_by_first_name(first_name: str, db: Session = Depends(get_db)):
     users = await repository_users.get_users_by_first_name(first_name, db)
     if users is None:
@@ -53,7 +53,7 @@ async def get_users_by_first_name(first_name: str, db: Session = Depends(get_db)
     return users
 
 
-@router.get("/last_name/{user_id}", response_model=List[UserResponse])
+@router.get("/last_name/{last_name}", response_model=List[UserResponse])
 async def get_users_by_last_name(last_name: str, db: Session = Depends(get_db)):
     users = await repository_users.get_users_by_last_name(last_name, db)
     if user is None:
@@ -61,7 +61,7 @@ async def get_users_by_last_name(last_name: str, db: Session = Depends(get_db)):
     return users
 
 
-@router.get("/email/{user_id}", response_model=UserResponse)
+@router.get("/email/{email}", response_model=UserResponse)
 async def get_user_by_email(body: UserModel, db: Session = Depends(get_db)):
     user = await repository_users.get_user_by_email(body.email, db)
     if user is None:
