@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Path, status
@@ -23,18 +23,19 @@ async def get_users(db: Session = Depends(get_db)):
 async def get_users_birthday(db: Session = Depends(get_db)):
     #  async def get_users_birthday(difference_days: int = 7, db: Session = Depends(get_db)):
     difference_days = 7 + 1
-    present_day = datetime.datetime.now().date()
+    present_day = datetime.now()
 
     users = []
-    all_users = await repository_users.get_users(db).all()
+    all_users = await repository_users.get_users(db)
 
-    async for user in all_users:
-        if user['birthday'] is None:
+    for user in all_users:
+        if user.birthday is None:
             continue
-        birthday_user = user['birthday'].strptime('%d-%m-%Y')                         #  ------------------------
-                                                                                   # что приходит - может быть ошибка
+        birthday_user = datetime.strptime(user.birthday, '%d-%m-%Y')                         #  ------------------------
+        print(birthday_user, type(birthday_user))
+        print(present_day, type(present_day))                   # что приходит - может быть ошибка
         birthday_user_current_year = birthday_user.replace(year=present_day.year)
-        delta_birthday = (birthday_user_current_year - today).days
+        delta_birthday = (birthday_user_current_year - present_day).days
 
         if 0 < delta_birthday < difference_days:
             # user = User(user)          #  --------------------   )))))))))))))))))))))))))))))))))))))))

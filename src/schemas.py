@@ -13,7 +13,7 @@ class UserModel(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: int
+    id: int = 1
     first_name: str = 'Dmytro'
     last_name: str = 'Oseledko'
     email: EmailStr
